@@ -63,7 +63,12 @@ app.post("/api/persons", (request, response) => {
   if (!body.name || !body.number) {
     return response
       .status(400)
-      .json({ message: "name and number must be provided" });
+      .json({ error: "name and number must be provided" });
+  }
+
+  const isExisting = persons.find((person) => person.name === body.name);
+  if (isExisting) {
+    return response.status(400).json({ error: "name must be unique" });
   }
 
   const person = {
