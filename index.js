@@ -68,27 +68,28 @@ const generateId = () => {
   return Math.floor(Math.random() * 100000);
 };
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", async (request, response) => {
   const body = request.body;
   if (!body.name || !body.number) {
     return response
       .status(400)
       .json({ error: "name and number must be provided" });
   }
+  const persons = await Person.find({});
 
   const isExisting = persons.find((person) => person.name === body.name);
   if (isExisting) {
     return response.status(400).json({ error: "name must be unique" });
   }
 
-  const person = {
-    id: generateId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
-  persons = persons.concat(person);
+  });
 
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 const PORT = process.env.PORT;
