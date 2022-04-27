@@ -15,9 +15,10 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-app.get("/info", (request, response) => {
+app.get("/info", async (request, response) => {
+  const personCount = await Person.count({});
   response.send(`
-    <h1>Phonebook has info for ${persons.length} people</h1>
+    <h1>Phonebook has info for ${personCount} people</h1>
     <p>${new Date()}</p>
   `);
 });
