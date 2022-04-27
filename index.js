@@ -15,17 +15,17 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-app.get("/api/persons", (request, response) => {
-  Person.find({}).then((persons) => {
-    response.json(persons);
-  });
-});
-
 app.get("/info", (request, response) => {
   response.send(`
     <h1>Phonebook has info for ${persons.length} people</h1>
     <p>${new Date()}</p>
   `);
+});
+
+app.get("/api/persons", (request, response) => {
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 app.get("/api/persons/:id", (request, response, next) => {
@@ -43,10 +43,6 @@ app.delete("/api/persons/:id", (request, response, next) => {
     })
     .catch((error) => next(error));
 });
-
-const generateId = () => {
-  return Math.floor(Math.random() * 100000);
-};
 
 app.post("/api/persons", async (request, response) => {
   const body = request.body;
@@ -70,6 +66,19 @@ app.post("/api/persons", async (request, response) => {
   person.save().then((savedPerson) => {
     response.json(savedPerson);
   });
+});
+
+app.put("/api/persons/:id", (request, response, next) => {
+  const body = request.body;
+  const person = {
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then((updatedPerson) => {
+      response.json(updatedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 const unknownEndpoint = (request, response) => {
